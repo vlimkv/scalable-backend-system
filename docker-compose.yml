@@ -9,6 +9,8 @@ services:
       - .:/code
     env_file:
       - .env
+    environment:
+      PYTHONPATH: /code
     depends_on:
       - postgres
       - redis

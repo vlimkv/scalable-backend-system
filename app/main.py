@@ -2,6 +2,7 @@ from fastapi import FastAPI
 
 from app.api.v1.auth import router as auth_router
 from app.api.v1.health import router as health_router
+from app.api.v1.tasks import router as tasks_router
 from app.core.config import settings
 from app.core.database import engine
 from app.models.base import Base
@@ -22,3 +23,4 @@ async def on_startup() -> None:
 
 app.include_router(health_router)
 app.include_router(auth_router)
+app.include_router(tasks_router)

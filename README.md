@@ -23,7 +23,7 @@ It includes:
 
 ---
 
-## 🏗️ Architecture
+## Architecture
 
 ![Architecture](docs/architecture.png)
 
@@ -90,7 +90,7 @@ System architecture illustrating API layer, service layer, caching, and database
 
 ---
 
-## 🧪 Testing
+## Testing
 
 The project includes an async test suite using **pytest + httpx**.
 
@@ -130,7 +130,7 @@ docker compose exec app pytest -v
 
 ---
 
-## 📸 API Preview
+## API Preview
 
 ![Swagger](docs/swagger.png)
 
@@ -155,7 +155,7 @@ http://localhost:8000/docs
 
 ---
 
-## 🧪 Example Flow
+## Example Flow
 
 1. Register user
 2. Login → get tokens
@@ -166,7 +166,7 @@ http://localhost:8000/docs
 
 ---
 
-## 🧱 Project Structure
+## Project Structure
 ```bash
 app/
 ├── api/           # Routes

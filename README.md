@@ -1,5 +1,7 @@
 # Scalable Backend System (OpsFlow API)
 
+![CI](https://github.com/vlimkv/scalable-backend-system/actions/workflows/ci.yml/badge.svg)
+
 Production-ready FastAPI backend for a task and operations management platform.
 
 This project demonstrates real-world backend architecture, including authentication, role-based access control, caching, rate limiting, and observability.

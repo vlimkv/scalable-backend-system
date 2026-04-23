@@ -10,11 +10,8 @@ from app.api.v1.auth import router as auth_router
 from app.api.v1.health import router as health_router
 from app.api.v1.tasks import router as tasks_router
 from app.core.config import settings
-from app.core.database import engine
 from app.core.logging import configure_logging
 from app.core.rate_limit import limiter
-from app.models.base import Base
-from app.models import User, Task
 from app.utils.request_id import generate_request_id, set_request_id
 
 configure_logging()
@@ -66,13 +63,6 @@ async def log_requests(request: Request, call_next):
             client=request.client.host if request.client else None,
         )
         raise
-
-
-@app.on_event("startup")
-async def on_startup() -> None:
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
-
 
 app.include_router(health_router)
 app.include_router(auth_router)

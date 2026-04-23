@@ -1,3 +1,5 @@
+from collections.abc import Callable
+
 from fastapi import APIRouter, Depends, Header, HTTPException, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -5,7 +7,13 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.database import get_db
 from app.core.security import decode_token
 from app.models.user import User
-from app.schemas.auth import AuthResponse, LoginRequest, RegisterRequest
+from app.schemas.auth import (
+    AuthResponse,
+    LoginRequest,
+    LogoutRequest,
+    RefreshRequest,
+    RegisterRequest,
+)
 from app.schemas.user import UserResponse
 from app.services.auth_service import AuthService
 
@@ -37,6 +45,8 @@ async def get_current_user(
 
     try:
         payload = decode_token(token)
+        if payload.get("type") != "access":
+            raise ValueError("Invalid token type")
         user_id = int(payload["sub"])
     except Exception:
         raise HTTPException(
@@ -51,7 +61,25 @@ async def get_current_user(
             detail="User not found",
         )
 
+    if not user.is_active:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="User is inactive",
+        )
+
     return user
+
+
+def require_role(*allowed_roles: str) -> Callable:
+    async def role_dependency(current_user: User = Depends(get_current_user)) -> User:
+        if current_user.role not in allowed_roles:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Insufficient permissions",
+            )
+        return current_user
+
+    return role_dependency
 
 
 @router.post("/register", response_model=AuthResponse, status_code=status.HTTP_201_CREATED)
@@ -72,6 +100,31 @@ async def login(
     return await service.login(payload)
 
 
+@router.post("/refresh", response_model=AuthResponse)
+async def refresh(
+    payload: RefreshRequest,
+    db: AsyncSession = Depends(get_db),
+) -> AuthResponse:
+    service = AuthService(db)
+    return await service.refresh(payload)
+
+
+@router.post("/logout")
+async def logout(
+    payload: LogoutRequest,
+    db: AsyncSession = Depends(get_db),
+) -> dict[str, str]:
+    service = AuthService(db)
+    return await service.logout(payload)
+
+
 @router.get("/me", response_model=UserResponse)
 async def me(current_user: User = Depends(get_current_user)) -> UserResponse:
+    return UserResponse.model_validate(current_user)
+
+
+@router.get("/admin-only", response_model=UserResponse)
+async def admin_only(
+    current_user: User = Depends(require_role("admin")),
+) -> UserResponse:
     return UserResponse.model_validate(current_user)

@@ -17,17 +17,42 @@ def verify_password(password: str, hashed_password: str) -> bool:
     return pwd_context.verify(password, hashed_password)
 
 
-def create_access_token(subject: str | int, expires_delta: timedelta | None = None) -> str:
-    expire = datetime.now(timezone.utc) + (
-        expires_delta or timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
-    )
-
+def _build_token(
+    *,
+    subject: str | int,
+    token_type: str,
+    expires_delta: timedelta,
+    extra_claims: dict[str, Any] | None = None,
+) -> str:
+    expire = datetime.now(timezone.utc) + expires_delta
     payload: dict[str, Any] = {
         "sub": str(subject),
         "exp": expire,
-        "type": "access",
+        "type": token_type,
     }
+
+    if extra_claims:
+        payload.update(extra_claims)
+
     return jwt.encode(payload, settings.JWT_SECRET_KEY, algorithm=settings.JWT_ALGORITHM)
+
+
+def create_access_token(subject: str | int, role: str) -> str:
+    return _build_token(
+        subject=subject,
+        token_type="access",
+        expires_delta=timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES),
+        extra_claims={"role": role},
+    )
+
+
+def create_refresh_token(subject: str | int, token_version: int) -> str:
+    return _build_token(
+        subject=subject,
+        token_type="refresh",
+        expires_delta=timedelta(days=settings.REFRESH_TOKEN_EXPIRE_DAYS),
+        extra_claims={"token_version": token_version},
+    )
 
 
 def decode_token(token: str) -> dict[str, Any]:

@@ -105,7 +105,7 @@ It includes:
 ## Run Locally
 
 ```bash
-git clone https://github.com/your-username/scalable-backend-system.git
+git clone https://github.com/vlimkv/scalable-backend-system.git
 cd scalable-backend-system
 cp .env.example .env
 docker compose up --build

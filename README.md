@@ -23,6 +23,14 @@ It includes:
 
 ---
 
+## 🏗️ Architecture
+
+![Architecture](docs/architecture.png)
+
+System architecture illustrating API layer, service layer, caching, and database interactions.
+
+---
+
 ## Tech Stack
 
 - **FastAPI**
@@ -82,6 +90,24 @@ It includes:
 
 ---
 
+## 🧪 Testing
+
+The project includes an async test suite using **pytest + httpx**.
+
+Coverage includes:
+- authentication flow
+- protected routes
+- task creation & updates
+- status transitions
+
+Run tests:
+
+```bash
+docker compose exec app pytest -v
+```
+
+---
+
 ## API Endpoints
 
 ### Auth
@@ -101,6 +127,14 @@ It includes:
 
 ### Health
 - `GET /health`
+
+---
+
+## 📸 API Preview
+
+![Swagger](docs/swagger.png)
+
+Interactive API documentation powered by FastAPI (OpenAPI).
 
 ---
 
@@ -145,17 +179,18 @@ app/
 
 ---
 
-## Production Concepts Demonstrated
+## Production Engineering Concepts
 
-- Clean architecture (service layer)
-- JWT auth with refresh tokens
-- Role-based access control
-- Cache layer with invalidation
-- Rate limiting
-- tructured logging
-- Dockerized environment
+This project demonstrates real-world backend engineering practices:
 
----
+- Layered architecture (API → Service → Data)
+- JWT authentication with refresh tokens
+- Role-based access control (RBAC)
+- Redis caching with invalidation strategy
+- Rate limiting for API protection
+- Structured logging with request tracing
+- Async-first design (FastAPI + SQLAlchemy 2.0)
+- Dockerized development environment
+- Automated testing (pytest)
 
-## Notes
-This project is designed to simulate a real production backend system rather than a simple CRUD application.
+Designed to reflect patterns used in real production systems rather than simple CRUD applications.

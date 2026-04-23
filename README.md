@@ -1,6 +1,10 @@
 # Scalable Backend System (OpsFlow API)
 
 ![CI](https://github.com/vlimkv/scalable-backend-system/actions/workflows/ci.yml/badge.svg)
+![Python](https://img.shields.io/badge/python-3.11-blue)
+![FastAPI](https://img.shields.io/badge/FastAPI-green)
+![Docker](https://img.shields.io/badge/docker-ready-blue)
+![Tests](https://img.shields.io/badge/tests-passing-brightgreen)
 
 Production-ready FastAPI backend for a task and operations management platform.
 

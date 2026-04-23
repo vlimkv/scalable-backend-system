@@ -13,6 +13,7 @@ from app.schemas.task import (
     TaskStatusUpdate,
     TaskUpdate,
 )
+from app.services.cache_service import CacheService
 from app.services.task_service import TaskService
 from app.utils.pagination import PaginatedResponse
 
@@ -56,6 +57,20 @@ async def list_tasks(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
+    cache_key = CacheService.build_task_list_key(
+        page=page,
+        size=size,
+        status_filter=status_filter,
+        owner_id=owner_id,
+        assignee_id=assignee_id,
+        mine=mine,
+        current_user_id=current_user.id,
+    )
+
+    cached = await CacheService.get_json(cache_key)
+    if cached:
+        return cached
+
     service = TaskService(db)
     items, total = await service.list(
         page=page,
@@ -67,12 +82,15 @@ async def list_tasks(
         current_user=current_user,
     )
 
-    return {
-        "items": items,
+    response = {
+        "items": [TaskResponse.model_validate(item).model_dump(mode="json") for item in items],
         "total": total,
         "page": page,
         "size": size,
     }
+
+    await CacheService.set_json(cache_key, response, ttl=60)
+    return response
 
 
 @router.get("/{task_id}", response_model=TaskResponse)

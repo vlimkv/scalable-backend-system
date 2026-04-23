@@ -5,6 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.models.task import Task
 from app.models.user import User
 from app.schemas.task import TaskCreate, TaskUpdate
+from app.services.cache_service import CacheService
 
 
 class TaskService:
@@ -20,6 +21,7 @@ class TaskService:
         self.db.add(task)
         await self.db.commit()
         await self.db.refresh(task)
+        await CacheService.invalidate_task_lists()
         return task
 
     async def list(
@@ -68,6 +70,7 @@ class TaskService:
 
         await self.db.commit()
         await self.db.refresh(task)
+        await CacheService.invalidate_task_lists()
         return task
 
     async def update_status(self, task: Task, new_status: str) -> Task:
@@ -82,10 +85,12 @@ class TaskService:
         task.status = new_status
         await self.db.commit()
         await self.db.refresh(task)
+        await CacheService.invalidate_task_lists()
         return task
 
     async def assign(self, task: Task, assignee: User) -> Task:
         task.assignee_id = assignee.id
         await self.db.commit()
         await self.db.refresh(task)
+        await CacheService.invalidate_task_lists()
         return task
